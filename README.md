@@ -1,3 +1,5 @@
+> ⚠️ _**This project is in early development. Expect breaking changes.**_
+
 # sms-ai-assistant
 
 `sms-ai-assistant` is a **local, privacy-friendly AI assistant** that suggests replies to incoming SMS messages while you are using **Google Messages in your browser**.
