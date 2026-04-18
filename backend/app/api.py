@@ -1,8 +1,9 @@
 from fastapi import APIRouter
 
 from .models import SuggestReplyRequest, SuggestReplyResponse
-from .ollama_client import generate_reply, clean_reply
+from .ollama_client import generate_reply
 from .prompts.sms_reply import build_sms_reply_prompt
+from .utils.text_cleaning import clean_reply
 
 router = APIRouter()
 
