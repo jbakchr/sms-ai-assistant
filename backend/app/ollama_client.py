@@ -1,7 +1,16 @@
 import requests
 
 OLLAMA_URL = "http://localhost:11434/api/generate"
-MODEL_NAME = "llama3"
+MODEL_NAME = "gpt-oss:120b-cloud"
+
+def clean_reply(text: str) -> str:
+    text = text.strip()
+
+    # Fjern citationstegn i start/slut
+    if text.startswith('"') and text.endswith('"'):
+        text = text[1:-1].strip()
+
+    return text
 
 def generate_reply(prompt: str) -> str:
     response = requests.post(
@@ -10,6 +19,11 @@ def generate_reply(prompt: str) -> str:
             "model": MODEL_NAME,
             "prompt": prompt,
             "stream": False,
+            "options": {
+                "temperature": 0.15,
+                "top_p": 0.85,
+                "repeat_penalty": 1.1
+            }
         },
         timeout=60,
     )

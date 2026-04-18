@@ -1,30 +1,36 @@
 from fastapi import APIRouter
 
 from .models import SuggestReplyRequest, SuggestReplyResponse
-from .ollama_client import generate_reply
+from .ollama_client import clean_reply, generate_reply
 
 router = APIRouter()
 
 def build_prompt(message: str) -> str:
     return f"""
-Du er en hjælpsom assistent, der foreslår korte SMS-svar.
+Du er modtageren af en SMS.
+
+Skriv ét kort, naturligt SMS-svar på dansk.
 
 Regler:
-- Svar udelukkende på dansk
-- Hold svarene korte og naturlige
-- Maksimalt 1-2 sætninger
-- Brug en venlig, uformel tone
+- Maksimalt én sætning
+- Naturligt talesprog
+- Ikke formelt
+- Ingen forklaringer
+- Ingen spørgsmål
 
 Modtaget SMS:
-"{message}"
+{message}
 
-Foreslå et passende SMS-svar:
+SMS-svar:
 """.strip()
+
 
 @router.post("/suggest-reply", response_model=SuggestReplyResponse)
 def suggest_reply(request: SuggestReplyRequest):
     prompt = build_prompt(request.message)
-    reply = generate_reply(prompt)
+    
+    raw_reply = generate_reply(prompt)
+    reply = clean_reply(raw_reply)
 
     return SuggestReplyResponse(
         suggestions=[reply]
