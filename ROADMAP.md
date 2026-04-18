@@ -3,7 +3,7 @@
 This document outlines the **intended direction and milestones** for the `sms-ai-assistant` project.
 
 The roadmap is intentionally lightweight and pragmatic.  
-It reflects the current goals of the project, not fixed promises.
+It reflects current goals and learnings, not fixed promises.
 
 ---
 
@@ -11,9 +11,9 @@ It reflects the current goals of the project, not fixed promises.
 
 - Current version: **v0.1.0**
 - Phase: **Early development / proof of concept**
-- Distribution model: **Local, developer-driven setup**
+- Distribution model: **Local backend with Ollama (cloud models)**
 
-The immediate goal is to reach a first **working end-to-end prototype** (`v0.2.0`).
+The immediate goal is to reach a first **working end-to-end prototype** (`v0.2.0`) with high-quality SMS reply suggestions.
 
 ---
 
@@ -21,17 +21,17 @@ The immediate goal is to reach a first **working end-to-end prototype** (`v0.2.0
 
 **Primary goal:**
 
-> A local, privacy-first assistant that can suggest an SMS reply via AI when using Google Messages (web).
+> A working assistant that can suggest high-quality SMS replies in Danish while using Google Messages (web).
 
-This release focuses on **functionality over polish**.
+This release focuses on **quality and correctness over polish**.
 
 ### Backend
 
 - Local HTTP backend (e.g. FastAPI or Express)
-- Integration with Ollama for local LLM inference
-- Single API endpoint for suggesting SMS replies
-- Danish language support (model-dependent)
-- Simple, stable request/response format
+- Integration with Ollama using **cloud-hosted models**
+- Single, stable API endpoint for suggesting SMS replies
+- Prompt logic optimized for Danish SMS-style language
+- Simple request/response format
 
 ### Chrome Extension
 
@@ -54,13 +54,13 @@ This release focuses on **functionality over polish**.
 
 Potential improvements after `v0.2.0`:
 
-- Multiple reply suggestions
+- Multiple reply suggestions per message
 - Tone control (e.g. informal / neutral / professional)
-- Improved prompt engineering
+- Improved prompt tuning and response filtering
 - Better UI feedback (loading, errors)
-- More robust DOM handling
+- More robust DOM handling in Google Messages
 
-Scope will be adjusted based on real usage and feedback.
+Scope will be adjusted based on usage and feedback.
 
 ---
 
@@ -68,8 +68,9 @@ Scope will be adjusted based on real usage and feedback.
 
 Ideas that may be explored later:
 
-- Message classification (work vs personal)
-- Conversation context (limited history)
+- Hybrid model setup (cloud primary, local fallback)
+- Message classification (e.g. work vs personal)
+- Limited conversation context
 - Keyboard shortcuts
 - Extension settings page
 - Improved cross-language support
@@ -84,7 +85,7 @@ A `v1.0.0` release may be considered when:
 
 - The core architecture feels stable
 - The extension ↔ backend interface is unlikely to change
-- The project can be used without frequent breaking changes
+- The assistant can be used without frequent breaking changes
 - Documentation includes a clear “Getting Started” guide
 
 There is **no fixed timeline** for this milestone.
@@ -93,14 +94,16 @@ There is **no fixed timeline** for this milestone.
 
 ## 🧠 Philosophy
 
-- Focus on **local-first, privacy-first** design
+- Focus on **quality of suggestions**, especially for Danish
+- Be pragmatic about model choice (local vs cloud)
+- Prefer simplicity and transparency over feature count
 - Releases represent **meaningful milestones**, not perfection
-- Simplicity and transparency are preferred over feature count
 - The roadmap may change as the project evolves
 
 ---
 
 ## 🤝 Feedback
 
-Ideas, suggestions, and discussions are welcome.  
+Ideas, suggestions, and discussions are welcome.
+
 Please open an issue if you would like to propose changes to this roadmap.
