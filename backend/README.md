@@ -1,31 +1,32 @@
 # sms-ai-assistant – Backend
 
-This directory contains the **local backend service** for the `sms-ai-assistant` project.
+This directory contains the **backend service** for the `sms-ai-assistant` project.
 
-The backend is responsible for receiving SMS text, generating reply suggestions using a local language model (via Ollama), and returning those suggestions to the Chrome extension.
+The backend is responsible for receiving SMS text, generating reply suggestions using an AI language model accessed via **Ollama**, and returning those suggestions to the Chrome extension.
 
-All processing happens **locally** on the user's machine.
+The backend runs locally, while inference is currently performed using **Ollama Cloud models** for higher language quality.
 
 ---
 
 ## 🎯 Purpose
 
-The backend serves as a lightweight **AI orchestration layer**:
+The backend acts as a lightweight **AI orchestration layer** between the browser and the language model:
 
-- Exposes a simple HTTP API
-- Handles prompt construction and response formatting
-- Communicates with a locally running Ollama instance
-- Keeps browser logic and AI logic cleanly separated
+- Exposes a simple local HTTP API
+- Builds prompts and enforces response constraints
+- Calls an Ollama model (cloud-hosted)
+- Normalizes and returns reply suggestions to the UI
 
-The backend is intentionally minimal and designed for easy iteration.
+The backend is intentionally minimal and designed for rapid iteration.
 
 ---
 
-## 🧠 High-level responsibilities
+## 🧠 Responsibilities
 
-- Receive SMS text as input
-- Generate one or more reply suggestions
-- Enforce basic constraints (language, tone, length)
+- Accept incoming SMS text
+- Generate one or more suggested replies
+- Control tone, length, and style of responses
+- Remove unwanted artifacts (quotes, explanations, questions)
 - Return structured JSON responses
 
 The backend is **stateless** by design.
@@ -33,14 +34,14 @@ The backend is **stateless** by design.
 ---
 
 ## 🏗️ Project structure
-
 ```
 
 backend/
 ├── app/
 │ ├── main.py # FastAPI application entrypoint
 │ ├── api.py # HTTP API endpoints
-│ └── models.py # Request/response schemas
+│ ├── models.py # Request/response schemas
+│ └── ollama_client.py # Ollama integration (local or cloud)
 │
 ├── requirements.txt
 └── README.md
@@ -54,7 +55,11 @@ backend/
 ### Requirements
 
 - Python 3.10+
-- `pip` or equivalent package manager
+- `pip` (or equivalent)
+- Ollama installed and configured
+- An Ollama account (for cloud model access)
+
+---
 
 ### Install dependencies
 
@@ -62,7 +67,21 @@ From the `backend/` directory:
 
 ```bash
 pip install -r requirements.txt
+````
+
+---
+
+### Authenticate with Ollama Cloud
+
+You must sign in once to enable cloud models:
+
+```bash
+ollama signin
 ```
+
+This links your local Ollama client to your Ollama account.
+
+---
 
 ### Run the backend locally
 
@@ -73,7 +92,7 @@ uvicorn app.main:app --reload
 The backend will be available at:
 
 - API: <http://localhost:8000>
-- API docs (Swagger UI): <http://localhost:8000/docs>
+- API docs: <http://localhost:8000/docs>
 
 ---
 
@@ -81,13 +100,13 @@ The backend will be available at:
 
 ### `POST /suggest-reply`
 
-Suggests one or more SMS replies based on an incoming message.
+Generate one or more SMS reply suggestions.
 
 **Request body:**
 
 ```json
 {
-  "message": "Hej, jeg bliver lidt forsinket i dag"
+  "message": "Hej, jeg bliver ca. 10 minutter forsinket"
 }
 ```
 
@@ -95,44 +114,62 @@ Suggests one or more SMS replies based on an incoming message.
 
 ```json
 {
-  "suggestions": ["Det er helt fint 😊 Vi ses bare lidt senere."]
+  "suggestions": ["Det er helt fint, vi ses bare lidt senere."]
 }
 ```
 
-The exact behavior and response quality depend on the configured language model and prompt logic.
+The quality and style of responses depend on the selected Ollama model and prompt logic.
 
 ---
 
-## 🔐 Privacy & data handling
+## ☁️ Model usage
 
-- No data is stored
-- No external services are contacted
-- The backend communicates only with:
-  - the local browser (Chrome extension)
-  - the local Ollama service
+The backend currently uses **Ollama Cloud models**, for example:
 
-SMS content never leaves the machine.
+- `gpt-oss:120b-cloud` (default)
+
+Cloud models are used because they provide **significantly better results for Danish SMS-style language** than smaller local models.
+
+The architecture allows switching between:
+
+- Cloud models
+- Local models
+- Hybrid setups (future)
+
+without changing the API or Chrome extension.
+
+---
+
+## ⚠️ Data handling
+
+- SMS text is sent from the browser to the local backend
+- The backend forwards the prompt to Ollama (cloud-hosted model)
+- Responses are returned to the browser
+- No data is stored by the backend
+
+Inference is performed remotely when using cloud models.
 
 ---
 
 ## 🚧 Project status
 
-The backend is currently in **early development**.
+The backend is in **early development**.
 
-- APIs may change
+- API shape may change
 - Prompt logic is experimental
-- Error handling is intentionally minimal
+- Error handling is minimal by design
 
-Stability and configurability will improve over time.
+The focus is on correctness of replies and clarity of the architecture.
 
 ---
 
 ## 🔮 Planned improvements
 
-- Ollama integration for local inference
-- Improved prompt engineering
 - Multiple reply suggestions
-- Better validation and error handling
+- Improved prompt tuning
+- Optional tone selection
+- Optional local/cloud model switching
+- Better error handling and timeouts
 
 See the root `ROADMAP.md` for details.
 
@@ -140,6 +177,6 @@ See the root `ROADMAP.md` for details.
 
 ## 🤝 Contributing
 
-The backend is intentionally simple and hackable.
+The backend is intentionally simple and easy to modify.
 
-Feedback, ideas, and improvements are welcome via issues or pull requests.
+Ideas, improvements, and refactoring suggestions are welcome via issues or pull requests.
