@@ -1,28 +1,39 @@
 console.log("sms-ai-assistant content script loaded");
 
 // Midlertidig helper: find seneste besked (meget simpelt)
-function getLastMessageText() {
-  const messageElements = document.querySelectorAll(
-    "span[data-elevate-message-text]",
+function getLastIncomingMessageText() {
+  const messageWrapper = document.querySelector(
+    'mws-message-wrapper[is-last="true"][is-outgoing="false"]',
   );
 
-  if (!messageElements.length) {
+  if (!messageWrapper) {
+    console.warn("No last incoming message wrapper found");
     return null;
   }
 
-  return messageElements[messageElements.length - 1].innerText;
+  const textElement = messageWrapper.querySelector(".text-msg-content");
+
+  if (!textElement) {
+    console.warn("No text content found in message wrapper");
+    return null;
+  }
+
+  // innerText bevarer linjeskift og emojis korrekt
+  const text = textElement.innerText.trim();
+
+  return text || null;
 }
 
 // Midlertidig handling: kald backend og log svaret
 async function suggestReply() {
-  const message = getLastMessageText();
+  const message = getLastIncomingMessageText();
 
   if (!message) {
-    console.warn("No message found");
+    console.warn("No incoming message to reply to");
     return;
   }
 
-  console.log("Last message:", message);
+  console.log("Last incoming message:", message);
 
   try {
     const response = await fetch("http://localhost:8000/suggest-reply", {
@@ -40,5 +51,5 @@ async function suggestReply() {
   }
 }
 
-// Midlertidig trigger (for testing)
+// Midlertidig auto-trigger
 setTimeout(suggestReply, 3000);
