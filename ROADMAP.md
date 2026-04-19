@@ -1,109 +1,89 @@
 # Roadmap
 
-This document outlines the **intended direction and milestones** for the `sms-ai-assistant` project.
+This document outlines the **intended direction and scope** of the `sms-ai-assistant` project.
 
-The roadmap is intentionally lightweight and pragmatic.  
-It reflects current goals and learnings, not fixed promises.
+The roadmap is intentionally lightweight and flexible.  
+It reflects current priorities and learning goals—not fixed promises.
 
 ---
 
 ## 🧭 Project status
 
-- Current version: **v0.1.0**
-- Phase: **Early development / proof of concept**
-- Distribution model: **Local backend with Ollama (cloud models)**
+- Current version: **v0.2.0**
+- Phase: **First usable prototype**
+- Target audience: Developers and experimenters
 
-The immediate goal is to reach a first **working end-to-end prototype** (`v0.2.0`) with high-quality SMS reply suggestions.
-
----
-
-## 🎯 v0.2.0 – First working prototype
-
-**Primary goal:**
-
-> A working assistant that can suggest high-quality SMS replies in Danish while using Google Messages (web).
-
-This release focuses on **quality and correctness over polish**.
-
-### Backend
-
-- Local HTTP backend (e.g. FastAPI or Express)
-- Integration with Ollama using **cloud-hosted models**
-- Single, stable API endpoint for suggesting SMS replies
-- Prompt logic optimized for Danish SMS-style language
-- Simple request/response format
-
-### Chrome Extension
-
-- Minimal Chrome extension injected into Google Messages (web)
-- Ability to read the latest incoming SMS from the DOM
-- Manual action (e.g. button) to trigger reply suggestion
-- Display or insert the suggested reply
-
-### Explicitly out of scope
-
-- UI polish or theming
-- Configuration UI
-- Authentication or persistence
-- Advanced error handling
-- Automated replies
+The project now works end-to-end and can be used by others following the documentation.
 
 ---
 
-## 🔜 v0.3.x – Refinement & usability
+## ✅ v0.2.0 – First usable prototype (completed)
 
-Potential improvements after `v0.2.0`:
+**Goal:**  
+Deliver a working, end-to-end AI-assisted SMS reply flow inside Google Messages (web).
 
-- Multiple reply suggestions per message
-- Tone control (e.g. informal / neutral / professional)
-- Improved prompt tuning and response filtering
-- Better UI feedback (loading, errors)
-- More robust DOM handling in Google Messages
+### Delivered features
 
-Scope will be adjusted based on usage and feedback.
+- Chrome extension integration with Google Messages (web)
+- UI button to request reply suggestions
+- Automatic insertion of AI-generated replies into the message input field
+- Local FastAPI backend
+- Integration with Ollama Cloud models
+- Clear project documentation and setup guides
+
+This release establishes a solid technical foundation without focusing on polish or configurability.
 
 ---
 
-## 🔮 v0.4.x and beyond – Exploration phase
+## 🔜 v0.3.x – Iteration & quality improvements
 
-Ideas that may be explored later:
+Likely next steps focus on **incremental improvements**, not new product scope.
 
+Possible areas:
+
+- Better UX feedback (loading state, disabled button while generating)
+- Multiple reply suggestions per request
+- Improved error handling and resilience
+- Minor UI refinements
+- Internal refactoring and cleanup
+
+Exact scope will be driven by usage and feedback.
+
+---
+
+## 🔮 v0.4.x – Exploration phase
+
+Ideas that _may_ be explored later if the project continues:
+
+- Optional tone or style variations
 - Hybrid model setup (cloud primary, local fallback)
-- Message classification (e.g. work vs personal)
 - Limited conversation context
-- Keyboard shortcuts
-- Extension settings page
+- Simple configuration options
 - Improved cross-language support
 
-No commitment is made for these features.
+There is **no commitment** to implement these features.
 
 ---
 
-## 🟢 v1.0.0 – Stable release (future)
+## 🟢 v1.0.0 – Stable release (future, optional)
 
-A `v1.0.0` release may be considered when:
+A v1.0.0 release may be considered if:
 
-- The core architecture feels stable
-- The extension ↔ backend interface is unlikely to change
-- The assistant can be used without frequent breaking changes
-- Documentation includes a clear “Getting Started” guide
+- The core UX feels stable
+- The extension ↔ backend interface stops changing
+- The project sees sustained interest or usage
+- Configuration and robustness improve
 
-There is **no fixed timeline** for this milestone.
-
----
-
-## 🧠 Philosophy
-
-- Focus on **quality of suggestions**, especially for Danish
-- Be pragmatic about model choice (local vs cloud)
-- Prefer simplicity and transparency over feature count
-- Releases represent **meaningful milestones**, not perfection
-- The roadmap may change as the project evolves
+There is **no timeline** or guarantee for this milestone.
 
 ---
 
-## 🤝 Feedback
+## 🧠 Project philosophy
 
-Ideas, suggestions, and discussions are welcome.
+- Solve concrete, everyday problems
+- Prefer simple, readable solutions over abstraction
+- Treat AI as a helper—not an automator
+- Stay honest about trade-offs and limitations
+- Keep scope small and intentional
 
-Please open an issue if you would like to propose changes to this roadmap.
+The roadmap may change as the project and its usage evolve.
