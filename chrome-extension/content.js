@@ -19,14 +19,23 @@ async function suggestReply() {
     return;
   }
 
-  const res = await fetch("http://localhost:8000/suggest-reply", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message }),
-  });
+  try {
+    const res = await fetch("http://localhost:8000/suggest-reply", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message }),
+    });
 
-  const data = await res.json();
-  console.log("Suggested reply:", data.suggestions[0]);
+    const data = await res.json();
+    const suggestedReply = data.suggestions[0];
+
+    console.log("Suggested reply:", suggestedReply);
+
+    // ✅ INDSÆT I INPUTFELTET
+    insertTextIntoInput(suggestedReply);
+  } catch (error) {
+    console.error("Failed to fetch AI reply:", error);
+  }
 }
 
 function getButtonToolbar() {
@@ -69,3 +78,26 @@ new MutationObserver(insertButtonIfNeeded).observe(document.body, {
   childList: true,
   subtree: true,
 });
+
+function getMessageInputTextarea() {
+  return document.querySelector("textarea[data-e2e-message-input-box]");
+}
+
+function insertTextIntoInput(text) {
+  const textarea = getMessageInputTextarea();
+  if (!textarea) {
+    console.warn("Message input textarea not found");
+    return;
+  }
+
+  // Sæt teksten
+  textarea.value = text;
+
+  // Fortæl Angular at inputtet er ændret
+  textarea.dispatchEvent(new Event("input", { bubbles: true }));
+
+  // Sæt cursor til slutningen (UX)
+  textarea.focus();
+  textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+}
+``;
