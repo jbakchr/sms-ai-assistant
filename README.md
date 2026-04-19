@@ -2,11 +2,9 @@
 
 # sms-ai-assistant
 
-`sms-ai-assistant` is an AI-powered assistant that suggests replies to incoming SMS messages while you are using **Google Messages in your browser**.
+`sms-ai-assistant` is a Chrome-based AI assistant that suggests replies to incoming SMS messages while you are using **Google Messages (web)**.
 
-The assistant integrates directly into the Google Messages web UI via a Chrome extension and uses a **language model accessed through Ollama** to generate short, context-aware reply suggestions.
-
-At the moment, the project uses **Ollama Cloud models** to achieve higher-quality language output, especially for Danish.
+It works by injecting a small UI element into Google Messages and calling a local backend service, which uses **Ollama Cloud models** (currently `gpt-oss:120b-cloud`) to generate high-quality SMS reply suggestions in Danish.
 
 ---
 
@@ -14,118 +12,181 @@ At the moment, the project uses **Ollama Cloud models** to achieve higher-qualit
 
 When you receive an SMS in Google Messages (web):
 
-- You click a button (e.g. **“Suggest reply”**) inside the Google Messages UI
-- The assistant reads the latest incoming message
-- An AI model generates a short, context-aware reply suggestion
-- The suggested reply is shown or inserted into the reply field
+1. You click the 💡 **Suggest reply** button next to the send button
+2. The assistant reads the latest incoming message
+3. An AI model generates a short, context-aware reply
+4. The suggested reply is inserted into the message input field
+5. You can edit the text and send it manually
 
-You always stay in control — **nothing is sent automatically**, and you decide whether to send, edit, or discard the suggestion.
+Nothing is sent automatically.
 
 ---
 
-## 🎯 Goals of the project
+## 🎯 Project goals
 
 - ✅ Work directly inside **Google Messages (web)**
 - ✅ Generate **high-quality SMS reply suggestions**
-- ✅ Support **Danish** (primary focus)
-- ✅ Keep the solution simple, hackable, and developer-friendly
-- ✅ Use Ollama’s local and/or cloud models with minimal code changes
+- ✅ Focus on **Danish language support**
+- ✅ Be simple, transparent, and developer-friendly
+- ✅ Keep full control in the user’s hands
 
 ---
 
 ## 🧠 Architecture overview
 
-This repository is structured as a **monorepo**, containing all components needed to run the system:
+This repository is structured as a small **monorepo**:
 
 ```
 
 sms-ai-assistant/
 ├── chrome-extension/   # Chrome extension injected into Google Messages
-├── backend/            # Local HTTP service (prompt logic + Ollama integration)
+├── backend/            # Local HTTP service (FastAPI + Ollama)
 └── README.md
 
 ```
 
 ### Chrome Extension
-- Injects UI elements into Google Messages (e.g. a “Suggest reply” button)
-- Reads the latest incoming SMS from the DOM
-- Sends the message text to the local backend
-- Displays or inserts the suggested reply
+
+- Injects a 💡 button into the Google Messages UI
+- Detects the latest incoming SMS
+- Calls the local backend
+- Inserts the suggested reply into the input field
 
 ### Backend
-- Runs as a small local HTTP service (e.g. FastAPI or Express)
-- Builds prompts and controls tone/length
-- Calls an Ollama model (local or cloud)
+
+- Runs locally (FastAPI)
+- Builds prompts and post-processes model output
+- Calls Ollama (cloud model by default)
 - Returns one or more reply suggestions
 
-### Ollama
-- Provides a unified interface for both **local models** and **cloud-hosted models**
-- Makes it possible to switch models without changing the overall architecture
+---
+
+## 🚀 Getting Started
+
+These steps should get you from **clone** to **working AI replies** in 10–15 minutes.
+
+### 1. Prerequisites
+
+You will need:
+
+- **Google Chrome** (Chromium-based browser)
+- **Ollama** installed: https://ollama.com
+- An **Ollama account** (for cloud models)
+- **Python 3.10+**
+- Access to **Google Messages (web)**
 
 ---
 
-## ☁️ Model usage & data handling
+### 2. Clone the repository
 
-The project currently uses **Ollama Cloud models** (for example `gpt-oss:120b-cloud`) to achieve significantly better results for Danish SMS-style language.
-
-This means:
-
-- SMS content is sent to Ollama’s cloud infrastructure for inference
-- No SMS replies are sent automatically
-- The backend acts as a thin orchestration layer
-
-Future versions may support:
-- Local-only models
-- Hybrid setups (local fallback / cloud primary)
-- User-configurable model selection
+```bash
+git clone https://github.com/jbakchr/sms-ai-assistant.git
+cd sms-ai-assistant
+```
 
 ---
 
-## 🚧 Project status
+### 3. Set up and start the backend
 
-This project is currently in **early development / proof-of-concept**.
+```bash
+cd backend
+pip install -r requirements.txt
+```
 
-Current focus:
-- End-to-end functionality
-- High-quality reply suggestions
-- Minimal, understandable architecture
+Sign in to Ollama (one-time):
 
-Planned next steps:
-- Chrome extension polish
-- Better prompt tuning
-- Multiple reply suggestions
-- Optional configuration (tone, verbosity)
+```bash
+ollama signin
+```
+
+Start the backend:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+The backend should now be running at:
+
+    http://localhost:8000
+
+You can verify it by opening:
+
+    http://localhost:8000/docs
 
 ---
 
-## 🛠 Requirements
+### 4. Load the Chrome extension
 
-- **macOS / Linux / Windows**
-- **Chrome** (or Chromium-based browser)
-- https://ollama.com installed
-- An Ollama account (for cloud models)
+1.  Open Chrome and go to:
+    chrome://extensions
+2.  Enable **Developer Mode**
+3.  Click **Load unpacked**
+4.  Select the `chrome-extension/` folder from this repo
 
 ---
 
-## 💡 Why an AI assistant for SMS?
+### 5. Use the assistant
 
-Many existing “smart reply” systems are:
-- tightly coupled to specific platforms
-- difficult to customize
-- opaque in how replies are generated
+1.  Open Google Messages (web):
+    https://messages.google.com/web
+2.  Open a conversation with an incoming message
+3.  Look for the 💡 button next to the send button
+4.  Click it
+5.  The suggested reply will appear in the input field
 
-`sms-ai-assistant` explores a more transparent and developer-friendly approach:
+---
 
-> **Bring AI-assisted replies directly into your existing messaging workflow, with full control over how suggestions are generated.**
+## ☁️ Model usage
+
+By default, the backend uses an **Ollama Cloud model**:
+
+- `gpt-oss:120b-cloud`
+
+This model is used because smaller local models were not reliable enough for natural Danish SMS replies.
+
+The architecture allows switching to:
+
+- other cloud models
+- local models (future)
+- hybrid setups (future)
+
+---
+
+## ⚠️ Limitations (current scope)
+
+- One reply suggestion at a time
+- No configuration UI
+- No tone selection
+- No automatic sending
+- Chrome only (no Firefox/Safari)
+- Google Messages (web) only
+
+These are intentional trade-offs in this early version.
+
+---
+
+## 🧪 Project status
+
+This project is currently a **working proof-of-concept**.
+
+It is intended for:
+
+- experimentation
+- learning
+- developer-driven use
+
+The core functionality works end-to-end, but polish and configurability are still limited.
 
 ---
 
 ## 🤝 Contributing
 
-Ideas, feedback, and contributions are very welcome.
+Ideas, feedback, and pull requests are very welcome.
 
-This project is intentionally kept simple and easy to experiment with.  
-Feel free to open issues or submit pull requests.
+If you run into issues:
+
+- please check the README first
+- then open an issue with details about your setup
 
 ---
 
