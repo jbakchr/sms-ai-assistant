@@ -1,55 +1,71 @@
-console.log("sms-ai-assistant content script loaded");
+console.log("sms-ai-assistant loaded");
 
-// Midlertidig helper: find seneste besked (meget simpelt)
 function getLastIncomingMessageText() {
-  const messageWrapper = document.querySelector(
+  const wrapper = document.querySelector(
     'mws-message-wrapper[is-last="true"][is-outgoing="false"]',
   );
+  if (!wrapper) return null;
 
-  if (!messageWrapper) {
-    console.warn("No last incoming message wrapper found");
-    return null;
-  }
+  const textEl = wrapper.querySelector(".text-msg-content");
+  if (!textEl) return null;
 
-  const textElement = messageWrapper.querySelector(".text-msg-content");
-
-  if (!textElement) {
-    console.warn("No text content found in message wrapper");
-    return null;
-  }
-
-  // innerText bevarer linjeskift og emojis korrekt
-  const text = textElement.innerText.trim();
-
-  return text || null;
+  return textEl.innerText.trim();
 }
 
-// Midlertidig handling: kald backend og log svaret
 async function suggestReply() {
   const message = getLastIncomingMessageText();
-
   if (!message) {
-    console.warn("No incoming message to reply to");
+    console.warn("No incoming message found");
     return;
   }
 
-  console.log("Last incoming message:", message);
+  const res = await fetch("http://localhost:8000/suggest-reply", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message }),
+  });
 
-  try {
-    const response = await fetch("http://localhost:8000/suggest-reply", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ message }),
-    });
-
-    const data = await response.json();
-    console.log("Suggested reply:", data.suggestions[0]);
-  } catch (error) {
-    console.error("Error calling backend:", error);
-  }
+  const data = await res.json();
+  console.log("Suggested reply:", data.suggestions[0]);
 }
 
-// Midlertidig auto-trigger
-setTimeout(suggestReply, 3000);
+function getButtonToolbar() {
+  return document.querySelector(
+    "mws-message-compose-picker-buttons.inline-compose-buttons",
+  );
+}
+
+function createSuggestReplyButton() {
+  const button = document.createElement("button");
+  button.id = "sms-ai-suggest-button";
+  button.textContent = "💡";
+
+  button.className =
+    "mdc-icon-button mat-mdc-icon-button mat-mdc-button-base picker-button";
+
+  button.style.cursor = "pointer";
+
+  button.addEventListener("click", suggestReply);
+  return button;
+}
+
+function insertButtonIfNeeded() {
+  const toolbar = getButtonToolbar();
+  if (!toolbar) return;
+
+  if (document.getElementById("sms-ai-suggest-button")) return;
+
+  const button = createSuggestReplyButton();
+  toolbar.prepend(button);
+
+  console.log("✅ Suggest reply button inserted (toolbar)");
+}
+
+/* 👉 KALD DEN MED DET SAMME */
+insertButtonIfNeeded();
+
+/* 👉 OBSERVÉR EFTERÆNDINGER */
+new MutationObserver(insertButtonIfNeeded).observe(document.body, {
+  childList: true,
+  subtree: true,
+});
