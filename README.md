@@ -192,4 +192,5 @@ If you run into issues:
 
 ## 📜 License
 
-License to be determined.
+This project is licensed under the MIT License.
+See the LICENSE file for details.
